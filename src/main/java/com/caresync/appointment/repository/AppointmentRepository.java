@@ -1,6 +1,7 @@
-package com.caresync.appointment.domain.appointment;
+package com.caresync.appointment.repository;
 
-import com.caresync.appointment.domain.user.User;
+import com.caresync.appointment.entity.Appointment;
+import com.caresync.appointment.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

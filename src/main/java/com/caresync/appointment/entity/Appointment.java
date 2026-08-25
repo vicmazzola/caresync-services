@@ -1,6 +1,6 @@
-package com.caresync.appointment.domain.appointment;
+package com.caresync.appointment.entity;
 
-import com.caresync.appointment.domain.user.User;
+import com.caresync.appointment.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,3 +39,4 @@ public class Appointment {
     @Column(nullable = false)
     private AppointmentStatus status;
 }
+

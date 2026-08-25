@@ -1,4 +1,4 @@
-package com.caresync.appointment.domain.user;
+package com.caresync.appointment.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,3 +31,4 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 }
+

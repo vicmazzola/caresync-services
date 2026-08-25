@@ -1,7 +1,8 @@
-package com.caresync.appointment.domain.appointment;
+package com.caresync.appointment.entity;
 
 public enum AppointmentStatus {
     SCHEDULED,
     COMPLETED,
     CANCELLED
 }
+
