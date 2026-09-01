@@ -1,5 +1,7 @@
 package com.caresync.appointment.service;
 
+import com.caresync.appointment.messaging.AppointmentEvent;
+import com.caresync.appointment.messaging.AppointmentEventPublisher;
 import com.caresync.appointment.entity.Appointment;
 import com.caresync.appointment.repository.AppointmentRepository;
 import com.caresync.appointment.entity.AppointmentStatus;
@@ -16,13 +18,16 @@ public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final AppointmentEventPublisher appointmentEventPublisher;
 
     public AppointmentService(
             AppointmentRepository appointmentRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            AppointmentEventPublisher appointmentEventPublisher
     ) {
         this.appointmentRepository = appointmentRepository;
         this.userRepository = userRepository;
+        this.appointmentEventPublisher = appointmentEventPublisher;
     }
 
     public Appointment createAppointment(
@@ -52,7 +57,23 @@ public class AppointmentService {
         appointment.setNotes(notes);
         appointment.setStatus(AppointmentStatus.SCHEDULED);
 
-        return appointmentRepository.save(appointment);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        appointmentEventPublisher.publish(
+                new AppointmentEvent(
+                        "CREATED",
+                        savedAppointment.getId(),
+                        patient.getId(),
+                        patient.getName(),
+                        patient.getEmail(),
+                        doctor.getId(),
+                        doctor.getName(),
+                        savedAppointment.getDateTime(),
+                        savedAppointment.getStatus().name()
+                )
+        );
+
+        return savedAppointment;
     }
 
     public Appointment updateAppointment(
@@ -68,7 +89,23 @@ public class AppointmentService {
         appointment.setNotes(notes);
         appointment.setStatus(status);
 
-        return appointmentRepository.save(appointment);
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        appointmentEventPublisher.publish(
+                new AppointmentEvent(
+                        "UPDATED",
+                        savedAppointment.getId(),
+                        savedAppointment.getPatient().getId(),
+                        savedAppointment.getPatient().getName(),
+                        savedAppointment.getPatient().getEmail(),
+                        savedAppointment.getDoctor().getId(),
+                        savedAppointment.getDoctor().getName(),
+                        savedAppointment.getDateTime(),
+                        savedAppointment.getStatus().name()
+                )
+        );
+
+        return savedAppointment;
     }
 
     public List<Appointment> getPatientAppointments(
