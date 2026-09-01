@@ -71,21 +71,46 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
-    public List<Appointment> getPatientAppointments(Long patientId) {
+    public List<Appointment> getPatientAppointments(
+            Long patientId,
+            String authenticatedEmail,
+            boolean isPatient
+    ) {
         User patient = userRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
+
+        validatePatientAccess(patient, authenticatedEmail, isPatient);
 
         return appointmentRepository.findByPatient(patient);
     }
 
-    public List<Appointment> getFuturePatientAppointments(Long patientId) {
+    public List<Appointment> getFuturePatientAppointments(
+            Long patientId,
+            String authenticatedEmail,
+            boolean isPatient
+    ) {
         User patient = userRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
+
+        validatePatientAccess(patient, authenticatedEmail, isPatient);
 
         return appointmentRepository.findByPatientAndDateTimeAfter(
                 patient,
                 LocalDateTime.now()
         );
     }
+
+    private void validatePatientAccess(
+            User patient,
+            String authenticatedEmail,
+            boolean isPatient
+    ) {
+        if (isPatient && !patient.getEmail().equals(authenticatedEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Patients can only access their own appointments"
+            );
+        }
+    }
+
 }
 
